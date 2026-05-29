@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from prompts import system_prompt
+from call_function import available_functions
 
 def main():
     
@@ -26,7 +27,7 @@ def main():
     
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash", contents=messages, config=types.GenerateContentConfig(system_instruction=system_prompt),
+            model="gemini-2.5-flash", contents=messages, config=types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt),
         )
     except Exception as e:
         raise RuntimeError(f"api call failed: {e}")
@@ -41,7 +42,12 @@ def main():
             raise RuntimeError("response usage_metadata is None")
 
     try:
-        print(f"Response: \n{response.text}")
+        if response.function_calls != None:
+            for call in response.function_calls:
+                print(f"Calling function: {call.name}({call.args})")
+        else:
+            print(f"Response: \n{response.text}")
+            
     except ValueError as e:
         raise RuntimeError(f"Problem with response text: {e}")
 
