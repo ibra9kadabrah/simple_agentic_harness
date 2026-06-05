@@ -24,7 +24,7 @@ def get_files_info(working_directory, directory="."):
     if not valid_target_path:
         return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
 
-    if not directory:
+    if not os.path.isdir(target_path):
         return f'Error: "{directory}" is not a directory'
     
     # iterate over items in target dir, for each , record name, file_size, is it a dir?
@@ -37,7 +37,7 @@ def get_files_info(working_directory, directory="."):
             size = os.path.getsize(item_path)
             result_string += f"- {item}: file_size={size}, is_dir={is_dir}\n"
     except Exception as e:
-        raise Exception("Error: {e}")   
+        raise Exception(f"Error: {e}")   
     
     return result_string
 
